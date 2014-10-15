@@ -251,7 +251,7 @@ int FFT_CTX_init(FFT_CTX *ctx) {
 	return 1;
 }
 
-void FFT_CTX_free(FFT_CTX *ctx) {
+void FFT_CTX_clear(FFT_CTX *ctx) {
 	if (ctx == NULL) {
 		return;
 	}
@@ -259,11 +259,19 @@ void FFT_CTX_free(FFT_CTX *ctx) {
 		memset((void *) ctx->x1[i], 0, 64 * sizeof(uint32_t));
 		memset((void *) ctx->y1[i], 0, 64 * sizeof(uint32_t));
 		memset((void *) ctx->z1[i], 0, 64 * sizeof(uint32_t));
+	}
+	memset((void *) ctx->t1, 0, 64 * sizeof(uint32_t));
+}
+
+void FFT_CTX_free(FFT_CTX *ctx) {
+	if (ctx == NULL) {
+		return;
+	}
+	for (int i = 0; i < 64; i++) {
 		free(ctx->x1[i]);
 		free(ctx->y1[i]);
 		free(ctx->z1[i]);
 	}
-	memset((void *) ctx->t1, 0, 64 * sizeof(uint32_t));
 	free(ctx->x1);
 	free(ctx->y1);
 	free(ctx->z1);
