@@ -22,6 +22,7 @@ struct fft_ctx {
 typedef struct fft_ctx FFT_CTX;
 
 int FFT_CTX_init(FFT_CTX *ctx);
+void FFT_CTX_clear(FFT_CTX *ctx);
 void FFT_CTX_free(FFT_CTX *ctx);
 
 void FFT_mul(uint32_t *z, const uint32_t *x, const uint32_t *y, FFT_CTX *ctx);

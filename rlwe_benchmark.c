@@ -80,6 +80,9 @@ int main() {
 	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
 	TIME_OPERATION(rlwe_kex_compute_key_alice(b, s, c, k, &ctx), "rlwe_kex_compute_key_alice", ITERATIONS / 50)
 
+	FFT_CTX_clear(&ctx);
+	FFT_CTX_free(&ctx);
+
 	return 0;
 
 }

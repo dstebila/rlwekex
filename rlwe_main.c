@@ -50,6 +50,7 @@ int main() {
 		return -1;
 	}
 
+	FFT_CTX_clear(&ctx);
 	FFT_CTX_free(&ctx);
 
 	return 0;
