@@ -22,12 +22,18 @@
 #define getbit(a,x) (((a)[(x)/64] >> (uint64_t) ((x)%64)) & 1)
 #define clearbit(a,x) ((a)[(x)/64] &= ((~((uint64_t) 0)) - (((uint64_t) 1) << (uint64_t) ((x)%64))))
 
-#warning "Replace RANDOM_VARS, RANDOM8, RANDOM32, RANDOM64 functions in rlwe.c with a cryptographically secure pseudorandom number generator before use"
-/* RANDOM_VARS is used to define any variables that are needed by your particular instantiation of the RANDOM8, RANDOM32, or RANDOM64 functions */
-#define RANDOM_VARS
-#define RANDOM8 ((uint8_t) random())
-#define RANDOM32 ((uint32_t) (random() << 16) ^ random())
-#define RANDOM64 (((uint64_t) RANDOM32 << (uint64_t) 32) | ((uint64_t) RANDOM32))
+#define RLWE_RANDOMNESS_USE_OPENSSL_AES
+#if defined(RLWE_RANDOMNESS_USE_OPENSSL_AES)
+#include "rlwe_rand_openssl_aes.c"
+#elif defined(RLWE_RANDOMNESS_USE_OPENSSL_RC4)
+#include "rlwe_rand_openssl_rc4.c"
+#elif defined(RLWE_RANDOMNESS_USE_OPENSSL_RAND)
+#include "rlwe_rand_openssl_rand.c"
+#elif defined(RLWE_RANDOMNESS_USE_C_RANDOM_INSECURE)
+#include "rlwe_rand_c.c"
+#else
+#error "No randomness generation algorithm defined."
+#endif
 #define RANDOM192(c) c[0] = RANDOM64; c[1] = RANDOM64; c[2] = RANDOM64
 
 /* Returns 0 if a >= b
