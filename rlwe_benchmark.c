@@ -21,11 +21,23 @@
 
 #define ITERATIONS 10000
 
-static uint64_t rdtsc(void) {
+#if defined(__i386__)
+
+static __inline__ unsigned long long rdtsc(void)
+{
 	unsigned long long int x;
 	__asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
 	return x;
 }
+#elif defined(__x86_64__)
+
+static __inline__ unsigned long long rdtsc(void)
+{
+	unsigned hi, lo;
+	__asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
+	return ( (unsigned long long)lo)|( ((unsigned long long)hi)<<32 );
+}
+#endif
 
 #define START_TIMER \
 	gettimeofday(&timeval_start, NULL); \
@@ -35,7 +47,7 @@ static uint64_t rdtsc(void) {
 	gettimeofday(&timeval_end, NULL);
 #define PRINT_TIMER_AVG(op_name, it) \
 	printf("%-30s %15d %15d %15" PRIu64 "\n", (op_name), (it), \
-		(uint32_t) (timeval_end.tv_usec - timeval_start.tv_usec) / (it), \
+		(uint32_t) ((timeval_end.tv_usec+1000000*timeval_end.tv_sec) - (timeval_start.tv_usec+1000000*timeval_start.tv_sec)) / (it), \
 		(cycles_end - cycles_start) / (it));
 #define TIME_OPERATION(op, op_name, it) \
 	START_TIMER \
