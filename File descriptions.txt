@@ -1,0 +1,29 @@
+rlwe_benchmark.c
+- time multiple iterations of the high level cryptographic functions
+
+rlwe_main.c
+- basic test harness that calls the high level cryptographic functions
+- data sizes are hard-coded
+
+rlwe_kex.c
+- high-level cryptographic functions that wrap around mathematical operations for polynomial sampling, polynomial multiplication, and reconciliation/rounding
+- data sizes are hard-coded
+- has compile-switch to swap between calling constant-time algorithms (*_ct) and non-constant-time algorithms
+
+rlwe_a.h
+- a standardized 1024-element polynomial that all communicating parties fix in advance
+- this is generated uniformly at random
+
+rlwe_table.h
+- a table that's used for randomly sampling a 192-bit integer with a certain (Gaussian) distribution
+- this table must be generated using a certain algorithm that I'll provide later
+
+rlwe.c
+- implementation of the main mathematical operations
+- some operations have two implementations: constant_time (*_ct) and non-constant-time
+- data sizes are hard-coded, but it should not be too hard to change these to arbitrary size
+
+fft.c
+- implementation of polynomial multiplication using fast Fourier transform
+- data sizes are hard-coded; here it might be tricky to generalize these to arbitrary size, I am looking into getting more guidance on what to do here
+
