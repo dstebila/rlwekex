@@ -33,16 +33,10 @@ int main() {
 		return -1;
 	}
 
-	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
-		printf("Randomness allocation error.");
-		return -1;
-	}
+	rlwe_kex_generate_keypair(a, s_alice, b_alice, &ctx);
+	rlwe_kex_generate_keypair(a, s_bob, b_bob, &ctx);
 
-	rlwe_kex_generate_keypair(a, s_alice, b_alice, &ctx, &rand_ctx);
-	rlwe_kex_generate_keypair(a, s_bob, b_bob, &ctx, &rand_ctx);
-
-	rlwe_kex_compute_key_bob(b_alice, s_bob, c, k_bob, &ctx, &rand_ctx);
+	rlwe_kex_compute_key_bob(b_alice, s_bob, c, k_bob, &ctx);
 	rlwe_kex_compute_key_alice(b_bob, s_alice, c, k_alice, &ctx);
 
 	int keys_match = 1;
@@ -59,8 +53,6 @@ int main() {
 
 	FFT_CTX_clear(&ctx);
 	FFT_CTX_free(&ctx);
-
-	RAND_CTX_cleanup(&rand_ctx);
 
 	return 0;
 

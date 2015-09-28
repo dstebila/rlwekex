@@ -94,8 +94,8 @@ int main() {
 	TIME_OPERATION(round2(k, b), "round2", ITERATIONS / 10)
 	TIME_OPERATION(rec_ct(k, b, c), "rec_ct", ITERATIONS)
 	TIME_OPERATION(rec(k, b, c), "rec", ITERATIONS)
-	TIME_OPERATION(rlwe_kex_generate_keypair(rlwe_a, s, b, &ctx, &rand_ctx), "rlwe_kex_generate_keypair", ITERATIONS / 50)
-	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx, &rand_ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
+	TIME_OPERATION(rlwe_kex_generate_keypair(rlwe_a, s, b, &ctx), "rlwe_kex_generate_keypair", ITERATIONS / 50)
+	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
 	TIME_OPERATION(rlwe_kex_compute_key_alice(b, s, c, k, &ctx), "rlwe_kex_compute_key_alice", ITERATIONS / 50)
 
 	FFT_CTX_clear(&ctx);
