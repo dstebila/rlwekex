@@ -74,26 +74,34 @@ int main() {
 		return -1;
 	}
 
+	RAND_CTX rand_ctx;
+	if (!RAND_CTX_init(&rand_ctx)) {
+		printf("Randomness allocation error.");
+		return -1;
+	}
+
 	printf("%-30s %15s %15s %15s\n", "Operation", "Iterations", "usec (avg)", "cycles (avg)");
 	printf("------------------------------------------------------------------------------\n");
 
-	TIME_OPERATION(sample_ct(s), "sample_ct", ITERATIONS / 50)
-	TIME_OPERATION(sample(s), "sample", ITERATIONS / 50)
+	TIME_OPERATION(sample_ct(s, &rand_ctx), "sample_ct", ITERATIONS / 50)
+	TIME_OPERATION(sample(s, &rand_ctx), "sample", ITERATIONS / 50)
 	TIME_OPERATION(FFT_mul(b, rlwe_a, s, &ctx), "FFT_mul", ITERATIONS / 50)
-	sample(e);
+	sample(e, &rand_ctx);
 	TIME_OPERATION(FFT_add(b, b, e), "FFT_add", ITERATIONS)
-	TIME_OPERATION(crossround2_ct(c, b), "crossround2_ct", ITERATIONS / 10)
-	TIME_OPERATION(crossround2(c, b), "crossround2", ITERATIONS / 10)
+	TIME_OPERATION(crossround2_ct(c, b, &rand_ctx), "crossround2_ct", ITERATIONS / 10)
+	TIME_OPERATION(crossround2(c, b, &rand_ctx), "crossround2", ITERATIONS / 10)
 	TIME_OPERATION(round2_ct(k, b), "round2_ct", ITERATIONS / 10)
 	TIME_OPERATION(round2(k, b), "round2", ITERATIONS / 10)
 	TIME_OPERATION(rec_ct(k, b, c), "rec_ct", ITERATIONS)
 	TIME_OPERATION(rec(k, b, c), "rec", ITERATIONS)
-	TIME_OPERATION(rlwe_kex_generate_keypair(rlwe_a, s, b, &ctx), "rlwe_kex_generate_keypair", ITERATIONS / 50)
-	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
+	TIME_OPERATION(rlwe_kex_generate_keypair(rlwe_a, s, b, &ctx, &rand_ctx), "rlwe_kex_generate_keypair", ITERATIONS / 50)
+	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx, &rand_ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
 	TIME_OPERATION(rlwe_kex_compute_key_alice(b, s, c, k, &ctx), "rlwe_kex_compute_key_alice", ITERATIONS / 50)
 
 	FFT_CTX_clear(&ctx);
 	FFT_CTX_free(&ctx);
+
+	RAND_CTX_cleanup(&rand_ctx);
 
 	return 0;
 

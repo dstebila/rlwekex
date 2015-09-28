@@ -14,9 +14,10 @@
 #include <stdint.h>
 
 #include "fft.h"
+#include "rlwe_rand.h"
 
-void sample_ct(uint32_t *s);
-void sample(uint32_t *s);
+void sample_ct(uint32_t *s, RAND_CTX *rand_ctx);
+void sample(uint32_t *s, RAND_CTX *rand_ctx);
 
 void round2_ct(uint64_t *out, const uint32_t *in);
 void round2(uint64_t *out, const uint32_t *in);
@@ -25,8 +26,8 @@ void round2(uint64_t *out, const uint32_t *in);
  * least significant positions. */
 uint64_t dbl(const uint32_t in, int32_t e);
 
-void crossround2_ct(uint64_t *out, const uint32_t *in);
-void crossround2(uint64_t *out, const uint32_t *in);
+void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
+void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
 
 void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b);
 void rec(uint64_t *out, const uint32_t *w, const uint64_t *b);

@@ -14,28 +14,13 @@
 #include <stdlib.h>
 
 #include "fft.h"
-#include "rlwe.h"
+#include "rlwe_rand.h"
 
 #include "rlwe_table.h"
 
 #define setbit(a,x) ((a)[(x)/64] |= (((uint64_t) 1) << (uint64_t) ((x)%64)))
 #define getbit(a,x) (((a)[(x)/64] >> (uint64_t) ((x)%64)) & 1)
 #define clearbit(a,x) ((a)[(x)/64] &= ((~((uint64_t) 0)) - (((uint64_t) 1) << (uint64_t) ((x)%64))))
-
-#define RLWE_RANDOMNESS_USE_OPENSSL_AES
-#if defined(RLWE_RANDOMNESS_USE_OPENSSL_AES)
-#include "rlwe_rand_openssl_aes.c"
-#elif defined(RLWE_RANDOMNESS_USE_OPENSSL_RC4)
-#include "rlwe_rand_openssl_rc4.c"
-#elif defined(RLWE_RANDOMNESS_USE_OPENSSL_RAND)
-#include "rlwe_rand_openssl_rand.c"
-#elif defined(RLWE_RANDOMNESS_USE_C_RANDOM_INSECURE)
-#include "rlwe_rand_c.c"
-#else
-#error "No randomness generation algorithm defined."
-#endif
-#define RANDOM192(c) c[0] = RANDOM64; c[1] = RANDOM64; c[2] = RANDOM64
-
 
 /* Auxiliary functions for constant-time comparison */
 
@@ -158,16 +143,15 @@ static uint32_t single_sample_ct(uint64_t *in) {
 	return index;
 }
 
-void sample_ct(uint32_t *s) {
-	RANDOM_VARS
+void sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 	int i, j;
 	for (i = 0; i < 16; i++) {
-		uint64_t r = RANDOM64;
+		uint64_t r = RANDOM64(rand_ctx);
 		for (j = 0; j < 64; j++) {
 			uint64_t rnd[3];
 			uint32_t m;
 			uint32_t t;
-			RANDOM192(rnd);
+			RANDOM192(rnd, rand_ctx);
 			m = (r & 1);
 			r >>= 1;
 			// use the constant time version single_sample
@@ -178,15 +162,14 @@ void sample_ct(uint32_t *s) {
 	}
 }
 
-void sample(uint32_t *s) {
-	RANDOM_VARS
+void sample(uint32_t *s, RAND_CTX *rand_ctx) {
 	int i, j;
 	for (i = 0; i < 16; i++) {
-		uint64_t r = RANDOM64;
+		uint64_t r = RANDOM64(rand_ctx);
 		for (j = 0; j < 64; j++) {
 			uint64_t rnd[3];
 			int32_t m;
-			RANDOM192(rnd);
+			RANDOM192(rnd, rand_ctx);
 			m = (r & 1);
 			r >>= 1;
 			m = 2 * m - 1;
@@ -232,14 +215,13 @@ uint64_t dbl(const uint32_t in, int32_t e) {
 	return (uint64_t) ((((uint64_t) in) << (uint64_t) 1) - e);
 }
 
-void crossround2(uint64_t *out, const uint32_t *in) {
+void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	int i, j;
-	RANDOM_VARS
 	// out should have enough space for 1024-bits
 	memset(out, 0, 128);
 
 	for (i = 0; i < 64; i++) {
-		uint32_t e = RANDOM32;
+		uint32_t e = RANDOM32(rand_ctx);
 		for (j = 0; j < 16; j++) {
 			uint64_t dd = dbl(in[i * 16 + j], (int32_t) e);
 			e >>= 2;
@@ -251,12 +233,11 @@ void crossround2(uint64_t *out, const uint32_t *in) {
 	}
 }
 
-void crossround2_ct(uint64_t *out, const uint32_t *in) {
-	RANDOM_VARS
+void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	int i, j;
 	memset(out, 0, 128);
 	for (i = 0; i < 64; i++) {
-		uint32_t e = RANDOM32;
+		uint32_t e = RANDOM32(rand_ctx);
 		for (j = 0; j < 16; j++) {
 			uint64_t dd;
 			uint64_t b;

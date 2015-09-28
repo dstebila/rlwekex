@@ -14,12 +14,13 @@
 #include <stdint.h>
 
 #include "fft.h"
+#include "rlwe_rand.h"
 
 /* Generate keypair for RLWE KEX
  * - input: parameters: a
  * - output: private key s, public key b
  */
-void rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx);
+void rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx, RAND_CTX *rand_ctx);
 
 /* Alice's shared key computation for RLWE KEX
  * - input: Bob's public key b, Alice's private key s, reconciliation data c
@@ -31,6 +32,6 @@ void rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], 
  * - input: Alice's public key b, Bob's private key s
  * - output: reconciliation data c, shared secret k
  */
-void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx);
+void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx, RAND_CTX *rand_ctx);
 
 #endif /* _RLWE_KEX_H_ */

@@ -1,21 +1,61 @@
-#warning "RC4 should not be considered a cryptographically secure pseudorandom number generator due to biases in its keystream output.  See rlwe.c to switch to an AES-based PRNG."
+#warning "RC4 should not be considered a cryptographically secure pseudorandom number generator due to biases in its keystream output.  See rlwe_rand.h to switch to an AES-based PRNG."
 
+#include "rlwe_rand.h"
+
+#include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <openssl/rc4.h>
+#include <stdio.h>
+#include <string.h>
 
-#define RANDOM_VARS \
-	RC4_KEY rc4_key; \
-	unsigned char rc4_key_bytes[16]; \
-	RAND_bytes(rc4_key_bytes, 16); \
-	RC4_set_key(&rc4_key, 16, rc4_key_bytes);
+int RAND_CTX_init(RAND_CTX *rand_ctx) {
+	unsigned char rc4_key[16];
+	RAND_bytes(rc4_key, 16);
+	EVP_CIPHER_CTX_init(rand_ctx);
+	return EVP_EncryptInit_ex(rand_ctx, EVP_rc4(), NULL, rc4_key, NULL);
+}
 
-#define RANDOM8   ((uint8_t) randomplease(&rc4_key))
-#define RANDOM32 ((uint32_t) randomplease(&rc4_key))
-#define RANDOM64 ((uint64_t) randomplease(&rc4_key))
+void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+	EVP_CIPHER_CTX_cleanup(rand_ctx);
+}
 
-uint64_t randomplease(RC4_KEY *rc4_key) {
-	uint64_t b;
-	uint64_t z = (uint64_t) 0;
-	RC4(rc4_key, 8, (unsigned char *) &z, (unsigned char *) &b);
-	return b;
+uint8_t  RANDOM8(RAND_CTX *rand_ctx) {
+	uint8_t in = 0;
+	uint8_t out;
+	int outlen;
+	int ret = EVP_EncryptUpdate(rand_ctx, (unsigned char *) &out, &outlen, (unsigned char *) &in, sizeof(uint8_t));
+	if (ret != 1) {
+		fprintf(stderr, "Randomness generation failed.\n");
+	}
+	return out;
+}
+
+uint32_t RANDOM32(RAND_CTX *rand_ctx) {
+	uint32_t in = 0;
+	uint32_t out;
+	int outlen;
+	int ret = EVP_EncryptUpdate(rand_ctx, (unsigned char *) &out, &outlen, (unsigned char *) &in, sizeof(uint32_t));
+	if (ret != 1) {
+		fprintf(stderr, "Randomness generation failed.\n");
+	}
+	return out;
+}
+
+uint64_t RANDOM64(RAND_CTX *rand_ctx) {
+	uint64_t in = 0;
+	uint64_t out;
+	int outlen;
+	int ret = EVP_EncryptUpdate(rand_ctx, (unsigned char *) &out, &outlen, (unsigned char *) &in, sizeof(uint64_t));
+	if (ret != 1) {
+		fprintf(stderr, "Randomness generation failed.\n");
+	}
+	return out;
+}
+
+void RANDOM192(uint64_t r[3], RAND_CTX *rand_ctx) {
+	uint64_t in[] = {0,0,0};
+	int outlen;
+	int ret = EVP_EncryptUpdate(rand_ctx, (unsigned char *) r, &outlen, (unsigned char *) &in, sizeof(uint64_t));
+	if (ret != 1) {
+		fprintf(stderr, "Randomness generation failed.\n");
+	}
 }
