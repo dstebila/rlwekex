@@ -154,7 +154,7 @@ static uint32_t single_sample_ct(uint64_t *in) {
 	return index;
 }
 
-void sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
+void rlwe_sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 	int i, j;
 	for (i = 0; i < 16; i++) {
 		uint64_t r = RANDOM64(rand_ctx);
@@ -173,7 +173,7 @@ void sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 	}
 }
 
-void round2_ct(uint64_t *out, const uint32_t *in) {
+void rlwe_round2_ct(uint64_t *out, const uint32_t *in) {
 	int i;
 	memset(out, 0, 128);
 	for (i = 0; i < 1024; i++) {
@@ -183,7 +183,7 @@ void round2_ct(uint64_t *out, const uint32_t *in) {
 	}
 }
 
-void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
+void rlwe_crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	int i, j;
 	memset(out, 0, 128);
 	for (i = 0; i < 64; i++) {
@@ -200,7 +200,7 @@ void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	}
 }
 
-void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
+void rlwe_rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 	int i;
 	memset(out, 0, 128);
 	for (i = 0; i < 1024; i++) {
@@ -217,7 +217,7 @@ void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 
 #else
 
-void sample(uint32_t *s, RAND_CTX *rand_ctx) {
+void rlwe_sample(uint32_t *s, RAND_CTX *rand_ctx) {
 	int i, j;
 	for (i = 0; i < 16; i++) {
 		uint64_t r = RANDOM64(rand_ctx);
@@ -236,7 +236,7 @@ void sample(uint32_t *s, RAND_CTX *rand_ctx) {
 	}
 }
 
-void round2(uint64_t *out, const uint32_t *in) {
+void rlwe_round2(uint64_t *out, const uint32_t *in) {
 	int i;
 
 	// out should have enough space for 1024-bits
@@ -250,7 +250,7 @@ void round2(uint64_t *out, const uint32_t *in) {
 	}
 }
 
-void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
+void rlwe_crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	int i, j;
 	// out should have enough space for 1024-bits
 	memset(out, 0, 128);
@@ -268,7 +268,7 @@ void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	}
 }
 
-void rec(uint64_t *out, const uint32_t *w, const uint64_t *b) {
+void rlwe_rec(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 	int i;
 
 	// out should have enough space for 1024-bits
@@ -292,7 +292,7 @@ void rec(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 
 #endif
 
-void key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx) {
+void rlwe_key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx) {
 	FFT_mul(out, a, s, ctx);
 	FFT_add(out, out, e);
 }

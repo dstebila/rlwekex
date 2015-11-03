@@ -17,17 +17,17 @@
 #include "rlwe_rand.h"
 
 #ifdef CONSTANT_TIME
-void sample_ct(uint32_t *s, RAND_CTX *rand_ctx);
-void round2_ct(uint64_t *out, const uint32_t *in);
-void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
-void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b);
+void rlwe_sample_ct(uint32_t *s, RAND_CTX *rand_ctx);
+void rlwe_round2_ct(uint64_t *out, const uint32_t *in);
+void rlwe_crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
+void rlwe_rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b);
 #else
-void sample(uint32_t *s, RAND_CTX *rand_ctx);
-void round2(uint64_t *out, const uint32_t *in);
-void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
-void rec(uint64_t *out, const uint32_t *w, const uint64_t *b);
+void rlwe_sample(uint32_t *s, RAND_CTX *rand_ctx);
+void rlwe_round2(uint64_t *out, const uint32_t *in);
+void rlwe_crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
+void rlwe_rec(uint64_t *out, const uint32_t *w, const uint64_t *b);
 #endif
 
-void key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx);
+void rlwe_key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx);
 
 #endif /* _RLWE_H_ */
