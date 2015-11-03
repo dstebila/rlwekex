@@ -63,7 +63,7 @@ void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], ui
 #endif
 	key_gen(v, b, s, eprimeprime, ctx);
 #if CONSTANT_TIME
-	crossround2_ct(c, v, &rand_ctx`);
+	crossround2_ct(c, v, &rand_ctx);
 	round2_ct(k, v);
 #else
 	crossround2(c, v, &rand_ctx);
