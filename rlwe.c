@@ -134,6 +134,17 @@ static uint32_t single_sample(uint64_t *in) {
 	return lower_index;
 }
 
+/* We assume that e contains two random bits in the two
+ * least significant positions. */
+static uint64_t dbl(const uint32_t in, int32_t e) {
+	// sample uniformly from [-1, 0, 0, 1]
+	// Hence, 0 is sampled with twice the probability of 1
+	e = (((e >> 1) & 1) - ((int32_t) (e & 1)));
+	return (uint64_t) ((((uint64_t) in) << (uint64_t) 1) - e);
+}
+
+#ifdef CONSTANT_TIME
+
 /* Constant time version. */
 static uint32_t single_sample_ct(uint64_t *in) {
 	uint32_t index = 0, i;
@@ -161,6 +172,50 @@ void sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 		}
 	}
 }
+
+void round2_ct(uint64_t *out, const uint32_t *in) {
+	int i;
+	memset(out, 0, 128);
+	for (i = 0; i < 1024; i++) {
+		uint64_t b = ct_ge_u64(in[i], 1073741824ULL) &
+		             ct_le_u64(in[i], 3221225471ULL);
+		out[i / 64] |= b << (uint64_t)(i % 64);
+	}
+}
+
+void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
+	int i, j;
+	memset(out, 0, 128);
+	for (i = 0; i < 64; i++) {
+		uint32_t e = RANDOM32(rand_ctx);
+		for (j = 0; j < 16; j++) {
+			uint64_t dd;
+			uint64_t b;
+			dd = dbl(in[i * 16 + j], (int32_t) e);
+			e >>= 2;
+			b = (ct_ge_u64(dd, 2147483648ULL) & ct_le_u64(dd, 4294967295ULL)) |
+			    (ct_ge_u64(dd, 6442450942ULL) & ct_le_u64(dd, 8589934590ULL));
+			out[(i * 16 + j) / 64] |= (b << (uint64_t) ((i * 16 + j) % 64));
+		}
+	}
+}
+
+void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
+	int i;
+	memset(out, 0, 128);
+	for (i = 0; i < 1024; i++) {
+		uint64_t coswi;
+		uint64_t B;
+		coswi = (((uint64_t) w[i]) << (uint64_t) 1);
+		B = (ct_eq_u64(getbit(b, i), 0) & ct_ge_u64(coswi, 3221225472ULL) &
+		     ct_le_u64(coswi, 7516192766ULL)) |
+			(ct_eq_u64(getbit(b, i), 1) & ct_ge_u64(coswi, 1073741824ULL) &
+			 ct_le_u64(coswi, 5368709118ULL));
+		out[i / 64] |= (B << (uint64_t) (i % 64));
+	}
+}
+
+#else
 
 void sample(uint32_t *s, RAND_CTX *rand_ctx) {
 	int i, j;
@@ -195,26 +250,6 @@ void round2(uint64_t *out, const uint32_t *in) {
 	}
 }
 
-/* Constant time version. */
-void round2_ct(uint64_t *out, const uint32_t *in) {
-	int i;
-	memset(out, 0, 128);
-	for (i = 0; i < 1024; i++) {
-		uint64_t b = ct_ge_u64(in[i], 1073741824ULL) &
-		             ct_le_u64(in[i], 3221225471ULL);
-		out[i / 64] |= b << (uint64_t)(i % 64);
-	}
-}
-
-/* We assume that e contains two random bits in the two
- * least significant positions. */
-uint64_t dbl(const uint32_t in, int32_t e) {
-	// sample uniformly from [-1, 0, 0, 1]
-	// Hence, 0 is sampled with twice the probability of 1
-	e = (((e >> 1) & 1) - ((int32_t) (e & 1)));
-	return (uint64_t) ((((uint64_t) in) << (uint64_t) 1) - e);
-}
-
 void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 	int i, j;
 	// out should have enough space for 1024-bits
@@ -229,23 +264,6 @@ void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
 			if ((dd >= (uint64_t) 2147483648 && dd <= (uint64_t) 4294967295) || (dd >= (uint64_t) 6442450942 && dd <= (uint64_t) 8589934590)) {
 				setbit(out, (i * 16 + j));
 			}
-		}
-	}
-}
-
-void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx) {
-	int i, j;
-	memset(out, 0, 128);
-	for (i = 0; i < 64; i++) {
-		uint32_t e = RANDOM32(rand_ctx);
-		for (j = 0; j < 16; j++) {
-			uint64_t dd;
-			uint64_t b;
-			dd = dbl(in[i * 16 + j], (int32_t) e);
-			e >>= 2;
-			b = (ct_ge_u64(dd, 2147483648ULL) & ct_le_u64(dd, 4294967295ULL)) |
-			    (ct_ge_u64(dd, 6442450942ULL) & ct_le_u64(dd, 8589934590ULL));
-			out[(i * 16 + j) / 64] |= (b << (uint64_t) ((i * 16 + j) % 64));
 		}
 	}
 }
@@ -272,20 +290,7 @@ void rec(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 	}
 }
 
-void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
-	int i;
-	memset(out, 0, 128);
-	for (i = 0; i < 1024; i++) {
-		uint64_t coswi;
-		uint64_t B;
-		coswi = (((uint64_t) w[i]) << (uint64_t) 1);
-		B = (ct_eq_u64(getbit(b, i), 0) & ct_ge_u64(coswi, 3221225472ULL) &
-		     ct_le_u64(coswi, 7516192766ULL)) |
-			(ct_eq_u64(getbit(b, i), 1) & ct_ge_u64(coswi, 1073741824ULL) &
-			 ct_le_u64(coswi, 5368709118ULL));
-		out[i / 64] |= (B << (uint64_t) (i % 64));
-	}
-}
+#endif
 
 void key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx) {
 	FFT_mul(out, a, s, ctx);
