@@ -18,12 +18,13 @@
 #include "rlwe.h"
 #include "rlwe_rand.h"
 
-void rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx) {
+int rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx) {
+	int ret;
 	uint32_t e[1024];
 	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
-		fprintf(stderr, "Randomness allocation error.");
-		return;
+	ret = RAND_CTX_init(&rand_ctx);
+	if (!ret) {
+		return ret;
 	}
 #if CONSTANT_TIME
 	rlwe_sample_ct(s, &rand_ctx);
@@ -35,9 +36,10 @@ void rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1
 	rlwe_key_gen(b, a, s, e, ctx);
 	rlwe_memset_volatile(e, 0, 1024 * sizeof(uint32_t));
 	RAND_CTX_cleanup(&rand_ctx);
+	return ret;
 }
 
-void rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], const uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+int rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], const uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
 	uint32_t w[1024];
 	FFT_mul(w, b, s, ctx);
 #if CONSTANT_TIME
@@ -46,15 +48,17 @@ void rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], 
 	rlwe_rec(k, w, c);
 #endif
 	rlwe_memset_volatile(w, 0, 1024 * sizeof(uint32_t));
+	return 1;
 }
 
-void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+int rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+	int ret;
 	uint32_t v[1024];
 	uint32_t eprimeprime[1024];
 	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
-		fprintf(stderr, "Randomness allocation error.");
-		return;
+	ret = RAND_CTX_init(&rand_ctx);
+	if (!ret) {
+		return ret;
 	}
 #if CONSTANT_TIME
 	rlwe_sample_ct(eprimeprime, &rand_ctx);
@@ -72,5 +76,6 @@ void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], ui
 	rlwe_memset_volatile(v, 0, 1024 * sizeof(uint32_t));
 	rlwe_memset_volatile(eprimeprime, 0, 1024 * sizeof(uint32_t));
 	RAND_CTX_cleanup(&rand_ctx);
+	return ret;
 }
 
