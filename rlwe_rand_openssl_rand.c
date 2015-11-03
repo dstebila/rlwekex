@@ -4,6 +4,7 @@
 
 #include <openssl/rand.h>
 #include <stdio.h>
+#include <string.h>
 
 int RAND_CTX_init(RAND_CTX *rand_ctx) {
 	return 1;
@@ -45,3 +46,5 @@ void RANDOM192(uint64_t x[3], RAND_CTX *rand_ctx) {
 		fprintf(stderr, "Randomness generation failed.\n");
 	}
 }
+
+void *(*volatile rlwe_memset_volatile)(void *, int, size_t) = memset;

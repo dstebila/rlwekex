@@ -5,6 +5,7 @@
 #include <openssl/rand.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int RAND_CTX_init(RAND_CTX *rand_ctx) {
 	int ret = 1;
@@ -54,3 +55,5 @@ void RANDOM192(uint64_t r[3], RAND_CTX *rand_ctx) {
 		abort();
 	}
 }
+
+void *(*volatile rlwe_memset_volatile)(void *, int, size_t) = memset;
