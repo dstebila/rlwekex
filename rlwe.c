@@ -30,7 +30,7 @@
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_isnonzero_u64(uint64_t x) {
-    return (x|-x) >> 63;
+	return (x | -x) >> 63;
 }
 
 /*
@@ -39,7 +39,7 @@ static uint64_t ct_isnonzero_u64(uint64_t x) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_ne_u64(uint64_t x, uint64_t y) {
-    return ((x-y)|(y-x)) >> 63;
+	return ((x - y) | (y - x)) >> 63;
 }
 
 /*
@@ -48,7 +48,7 @@ static uint64_t ct_ne_u64(uint64_t x, uint64_t y) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_eq_u64(uint64_t x, uint64_t y) {
-    return 1 ^ ct_ne_u64(x, y);
+	return 1 ^ ct_ne_u64(x, y);
 }
 
 /* Returns 1 if x < y
@@ -56,7 +56,7 @@ static uint64_t ct_eq_u64(uint64_t x, uint64_t y) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_lt_u64(uint64_t x, uint64_t y) {
-    return (x^((x^y)|((x-y)^y))) >> 63;
+	return (x ^ ((x ^ y) | ((x - y)^y))) >> 63;
 }
 
 /*
@@ -65,7 +65,7 @@ static uint64_t ct_lt_u64(uint64_t x, uint64_t y) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_gt_u64(uint64_t x, uint64_t y) {
-    return ct_lt_u64(y, x);
+	return ct_lt_u64(y, x);
 }
 
 /*
@@ -74,7 +74,7 @@ static uint64_t ct_gt_u64(uint64_t x, uint64_t y) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_le_u64(uint64_t x, uint64_t y) {
-    return 1 ^ ct_gt_u64(x, y);
+	return 1 ^ ct_gt_u64(x, y);
 }
 
 /*
@@ -83,15 +83,14 @@ static uint64_t ct_le_u64(uint64_t x, uint64_t y) {
  * x and y are arbitrary unsigned 64-bit integers
  */
 static uint64_t ct_ge_u64(uint64_t x, uint64_t y) {
-    return 1 ^ ct_lt_u64(x, y);
+	return 1 ^ ct_lt_u64(x, y);
 }
 
 /* Returns 0xFFFF..FFFF if bit != 0
  * Returns            0 if bit == 0
  */
-static uint64_t ct_mask_u64(uint64_t bit)
-{
-    return 0 - (uint64_t)ct_isnonzero_u64(bit);
+static uint64_t ct_mask_u64(uint64_t bit) {
+	return 0 - (uint64_t)ct_isnonzero_u64(bit);
 }
 
 /* Conditionally return x or y depending on whether bit is set
@@ -100,8 +99,8 @@ static uint64_t ct_mask_u64(uint64_t bit)
  * bit must be either 0 or 1.
  */
 static uint64_t ct_select_u64(uint64_t x, uint64_t y, uint64_t bit) {
-    uint64_t m = ct_mask_u64(bit);
-    return (x&m) | (y&~m);
+	uint64_t m = ct_mask_u64(bit);
+	return (x & m) | (y & ~m);
 }
 
 /* Returns 0 if a >= b
@@ -113,7 +112,7 @@ static int cmplt_ct(uint64_t *a, uint64_t *b) {
 	uint64_t r = 0; /* result */
 	uint64_t m = 0; /* mask   */
 	int i;
-	for(i = 0; i < 3; ++i) {
+	for (i = 0; i < 3; ++i) {
 		r |= ct_lt_u64(a[i], b[i]) & ~m;
 		m |= ct_mask_u64(ct_ne_u64(a[i], b[i])); /* stop when a[i] != b[i] */
 	}
@@ -209,8 +208,8 @@ void rlwe_rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b) {
 		coswi = (((uint64_t) w[i]) << (uint64_t) 1);
 		B = (ct_eq_u64(getbit(b, i), 0) & ct_ge_u64(coswi, 3221225472ULL) &
 		     ct_le_u64(coswi, 7516192766ULL)) |
-			(ct_eq_u64(getbit(b, i), 1) & ct_ge_u64(coswi, 1073741824ULL) &
-			 ct_le_u64(coswi, 5368709118ULL));
+		    (ct_eq_u64(getbit(b, i), 1) & ct_ge_u64(coswi, 1073741824ULL) &
+		     ct_le_u64(coswi, 5368709118ULL));
 		out[i / 64] |= (B << (uint64_t) (i % 64));
 	}
 }

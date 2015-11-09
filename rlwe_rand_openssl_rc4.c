@@ -52,7 +52,7 @@ uint64_t RANDOM64(RAND_CTX *rand_ctx) {
 }
 
 void RANDOM192(uint64_t r[3], RAND_CTX *rand_ctx) {
-	uint64_t in[] = {0,0,0};
+	uint64_t in[] = {0, 0, 0};
 	int outlen;
 	int ret = EVP_EncryptUpdate(rand_ctx, (unsigned char *) r, &outlen, (unsigned char *) &in, sizeof(uint64_t));
 	if (ret != 1) {
