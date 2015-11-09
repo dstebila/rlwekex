@@ -83,17 +83,23 @@ int main() {
 	printf("%-30s %15s %15s %15s\n", "Operation", "Iterations", "usec (avg)", "cycles (avg)");
 	printf("------------------------------------------------------------------------------\n");
 
-	TIME_OPERATION(sample_ct(s, &rand_ctx), "sample_ct", ITERATIONS / 50)
-	TIME_OPERATION(sample(s, &rand_ctx), "sample", ITERATIONS / 50)
+#ifdef CONSTANT_TIME
+	TIME_OPERATION(rlwe_sample_ct(s, &rand_ctx), "sample_ct", ITERATIONS / 50)
 	TIME_OPERATION(FFT_mul(b, rlwe_a, s, &ctx), "FFT_mul", ITERATIONS / 50)
-	sample(e, &rand_ctx);
+	rlwe_sample_ct(e, &rand_ctx);
 	TIME_OPERATION(FFT_add(b, b, e), "FFT_add", ITERATIONS)
-	TIME_OPERATION(crossround2_ct(c, b, &rand_ctx), "crossround2_ct", ITERATIONS / 10)
-	TIME_OPERATION(crossround2(c, b, &rand_ctx), "crossround2", ITERATIONS / 10)
-	TIME_OPERATION(round2_ct(k, b), "round2_ct", ITERATIONS / 10)
-	TIME_OPERATION(round2(k, b), "round2", ITERATIONS / 10)
-	TIME_OPERATION(rec_ct(k, b, c), "rec_ct", ITERATIONS)
-	TIME_OPERATION(rec(k, b, c), "rec", ITERATIONS)
+	TIME_OPERATION(rlwe_crossround2_ct(c, b, &rand_ctx), "crossround2_ct", ITERATIONS / 10)
+	TIME_OPERATION(rlwe_round2_ct(k, b), "round2_ct", ITERATIONS / 10)
+	TIME_OPERATION(rlwe_rec_ct(k, b, c), "rec_ct", ITERATIONS)
+#else
+	TIME_OPERATION(rlwe_sample(s, &rand_ctx), "sample", ITERATIONS / 50)
+	TIME_OPERATION(FFT_mul(b, rlwe_a, s, &ctx), "FFT_mul", ITERATIONS / 50)
+	rlwe_sample(e, &rand_ctx);
+	TIME_OPERATION(FFT_add(b, b, e), "FFT_add", ITERATIONS)
+	TIME_OPERATION(rlwe_crossround2(c, b, &rand_ctx), "crossround2", ITERATIONS / 10)
+	TIME_OPERATION(rlwe_round2(k, b), "round2", ITERATIONS / 10)
+	TIME_OPERATION(rlwe_rec(k, b, c), "rec", ITERATIONS)
+#endif
 	TIME_OPERATION(rlwe_kex_generate_keypair(rlwe_a, s, b, &ctx), "rlwe_kex_generate_keypair", ITERATIONS / 50)
 	TIME_OPERATION(rlwe_kex_compute_key_bob(b, s, c, k, &ctx), "rlwe_kex_compute_key_bob", ITERATIONS / 50)
 	TIME_OPERATION(rlwe_kex_compute_key_alice(b, s, c, k, &ctx), "rlwe_kex_compute_key_alice", ITERATIONS / 50)

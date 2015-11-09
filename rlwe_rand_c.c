@@ -1,5 +1,7 @@
 #warning "Not using a cryptographically secure pseudorandom number generator.  See rlwe.c to switch to an OpenSSL-based PRNG or define your own."
 
+#include <string.h>
+
 #include "rlwe_rand.h"
 
 int RAND_CTX_init(RAND_CTX *rand_ctx) {
@@ -26,3 +28,5 @@ void RANDOM192(uint64_t r[3], RAND_CTX *rand_ctx) {
 	r[1] = RANDOM64(rand_ctx);
 	r[2] = RANDOM64(rand_ctx);
 }
+
+void *(*volatile rlwe_memset_volatile)(void *, int, size_t) = memset;

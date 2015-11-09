@@ -16,22 +16,18 @@
 #include "fft.h"
 #include "rlwe_rand.h"
 
-void sample_ct(uint32_t *s, RAND_CTX *rand_ctx);
-void sample(uint32_t *s, RAND_CTX *rand_ctx);
+#ifdef CONSTANT_TIME
+void rlwe_sample_ct(uint32_t *s, RAND_CTX *rand_ctx);
+void rlwe_round2_ct(uint64_t *out, const uint32_t *in);
+void rlwe_crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
+void rlwe_rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b);
+#else
+void rlwe_sample(uint32_t *s, RAND_CTX *rand_ctx);
+void rlwe_round2(uint64_t *out, const uint32_t *in);
+void rlwe_crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
+void rlwe_rec(uint64_t *out, const uint32_t *w, const uint64_t *b);
+#endif
 
-void round2_ct(uint64_t *out, const uint32_t *in);
-void round2(uint64_t *out, const uint32_t *in);
-
-/* We assume that e contains two random bits in the two
- * least significant positions. */
-uint64_t dbl(const uint32_t in, int32_t e);
-
-void crossround2_ct(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
-void crossround2(uint64_t *out, const uint32_t *in, RAND_CTX *rand_ctx);
-
-void rec_ct(uint64_t *out, const uint32_t *w, const uint64_t *b);
-void rec(uint64_t *out, const uint32_t *w, const uint64_t *b);
-
-void key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx);
+void rlwe_key_gen(uint32_t *out, const uint32_t *a, const uint32_t *s, const uint32_t *e, FFT_CTX *ctx);
 
 #endif /* _RLWE_H_ */

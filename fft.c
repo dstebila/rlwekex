@@ -12,6 +12,7 @@
 #include <string.h>
 
 #include "fft.h"
+#include "rlwe_rand.h"
 
 /* Reduction modulo p = 2^32 - 1.
  * This is not a prime since 2^32-1 = (2^1+1)*(2^2+1)*(2^4+1)*(2^8+1)*(2^16+1).
@@ -256,11 +257,11 @@ void FFT_CTX_clear(FFT_CTX *ctx) {
 		return;
 	}
 	for (int i = 0; i < 64; i++) {
-		memset((void *) ctx->x1[i], 0, 64 * sizeof(uint32_t));
-		memset((void *) ctx->y1[i], 0, 64 * sizeof(uint32_t));
-		memset((void *) ctx->z1[i], 0, 64 * sizeof(uint32_t));
+		rlwe_memset_volatile(ctx->x1[i], 0, 64 * sizeof(uint32_t));
+		rlwe_memset_volatile(ctx->y1[i], 0, 64 * sizeof(uint32_t));
+		rlwe_memset_volatile(ctx->z1[i], 0, 64 * sizeof(uint32_t));
 	}
-	memset((void *) ctx->t1, 0, 64 * sizeof(uint32_t));
+	rlwe_memset_volatile(ctx->t1, 0, 64 * sizeof(uint32_t));
 }
 
 void FFT_CTX_free(FFT_CTX *ctx) {

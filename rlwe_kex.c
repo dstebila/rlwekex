@@ -18,59 +18,64 @@
 #include "rlwe.h"
 #include "rlwe_rand.h"
 
-void rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx) {
+int rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[1024], FFT_CTX *ctx) {
+	int ret;
 	uint32_t e[1024];
 	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
-		fprintf(stderr, "Randomness allocation error.");
-		return;
+	ret = RAND_CTX_init(&rand_ctx);
+	if (!ret) {
+		return ret;
 	}
 #if CONSTANT_TIME
-	sample_ct(s, &rand_ctx);
-	sample_ct(e, &rand_ctx);
+	rlwe_sample_ct(s, &rand_ctx);
+	rlwe_sample_ct(e, &rand_ctx);
 #else
-	sample(s, &rand_ctx);
-	sample(e, &rand_ctx);
+	rlwe_sample(s, &rand_ctx);
+	rlwe_sample(e, &rand_ctx);
 #endif
-	key_gen(b, a, s, e, ctx);
-	memset((char *) e, 0, 1024 * sizeof(uint32_t));
+	rlwe_key_gen(b, a, s, e, ctx);
+	rlwe_memset_volatile(e, 0, 1024 * sizeof(uint32_t));
 	RAND_CTX_cleanup(&rand_ctx);
+	return ret;
 }
 
-void rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], const uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+int rlwe_kex_compute_key_alice(const uint32_t b[1024], const uint32_t s[1024], const uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
 	uint32_t w[1024];
 	FFT_mul(w, b, s, ctx);
 #if CONSTANT_TIME
-	rec_ct(k, w, c);
+	rlwe_rec_ct(k, w, c);
 #else
-	rec(k, w, c);
+	rlwe_rec(k, w, c);
 #endif
-	memset((char *) w, 0, 1024 * sizeof(uint32_t));
+	rlwe_memset_volatile(w, 0, 1024 * sizeof(uint32_t));
+	return 1;
 }
 
-void rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+int rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uint64_t c[16], uint64_t k[16], FFT_CTX *ctx) {
+	int ret;
 	uint32_t v[1024];
 	uint32_t eprimeprime[1024];
 	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
-		fprintf(stderr, "Randomness allocation error.");
-		return;
+	ret = RAND_CTX_init(&rand_ctx);
+	if (!ret) {
+		return ret;
 	}
 #if CONSTANT_TIME
-	sample_ct(eprimeprime, &rand_ctx);
+	rlwe_sample_ct(eprimeprime, &rand_ctx);
 #else
-	sample(eprimeprime, &rand_ctx);
+	rlwe_sample(eprimeprime, &rand_ctx);
 #endif
-	key_gen(v, b, s, eprimeprime, ctx);
+	rlwe_key_gen(v, b, s, eprimeprime, ctx);
 #if CONSTANT_TIME
-	crossround2_ct(c, v, &rand_ctx`);
-	round2_ct(k, v);
+	rlwe_crossround2_ct(c, v, &rand_ctx);
+	rlwe_round2_ct(k, v);
 #else
-	crossround2(c, v, &rand_ctx);
-	round2(k, v);
+	rlwe_crossround2(c, v, &rand_ctx);
+	rlwe_round2(k, v);
 #endif
-	memset((char *) v, 0, 1024 * sizeof(uint32_t));
-	memset((char *) eprimeprime, 0, 1024 * sizeof(uint32_t));
+	rlwe_memset_volatile(v, 0, 1024 * sizeof(uint32_t));
+	rlwe_memset_volatile(eprimeprime, 0, 1024 * sizeof(uint32_t));
 	RAND_CTX_cleanup(&rand_ctx);
+	return ret;
 }
 

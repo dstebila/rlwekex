@@ -59,3 +59,5 @@ void RANDOM192(uint64_t r[3], RAND_CTX *rand_ctx) {
 		fprintf(stderr, "Randomness generation failed.\n");
 	}
 }
+
+void *(*volatile rlwe_memset_volatile)(void *, int, size_t) = memset;
