@@ -1,5 +1,6 @@
 #warning "Not using a cryptographically secure pseudorandom number generator.  See rlwe.c to switch to an OpenSSL-based PRNG or define your own."
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "rlwe_rand.h"

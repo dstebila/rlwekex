@@ -15,6 +15,8 @@ To compile:
 
 	make
 
+Note that compilation on Mac OS X with the downloaded ZIP will fail, because the library uses OpenSSL for randomness generation, and Mac OS X has an old version of OpenSSL in a peculiar location.  Either change the random number generator to the insecure one (see the instructions below) or install and use a newer version of OpenSSL (see the comments at the top of the Makefile).
+
 To run the sample key generation program:
 
 	./rlwe_main
