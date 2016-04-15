@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <string.h>
 
-int RAND_CTX_init(RAND_CTX *rand_ctx) {
+int RAND_CHOICE_init(RAND_CTX *rand_ctx) {
 	return 1;
 }
 
-void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx) {
 }
 
 uint8_t  RANDOM8(RAND_CTX *rand_ctx) {

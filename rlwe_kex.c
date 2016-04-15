@@ -22,7 +22,7 @@ int rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[10
 	int ret;
 	uint32_t e[1024];
 	RAND_CTX rand_ctx;
-	ret = RAND_CTX_init(&rand_ctx);
+	ret = RAND_CHOICE_init(&rand_ctx);
 	if (!ret) {
 		return ret;
 	}
@@ -35,7 +35,7 @@ int rlwe_kex_generate_keypair(const uint32_t *a, uint32_t s[1024], uint32_t b[10
 #endif
 	rlwe_key_gen(b, a, s, e, ctx);
 	rlwe_memset_volatile(e, 0, 1024 * sizeof(uint32_t));
-	RAND_CTX_cleanup(&rand_ctx);
+	RAND_CHOICE_cleanup(&rand_ctx);
 	return ret;
 }
 
@@ -56,7 +56,7 @@ int rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uin
 	uint32_t v[1024];
 	uint32_t eprimeprime[1024];
 	RAND_CTX rand_ctx;
-	ret = RAND_CTX_init(&rand_ctx);
+	ret = RAND_CHOICE_init(&rand_ctx);
 	if (!ret) {
 		return ret;
 	}
@@ -75,7 +75,7 @@ int rlwe_kex_compute_key_bob(const uint32_t b[1024], const uint32_t s[1024], uin
 #endif
 	rlwe_memset_volatile(v, 0, 1024 * sizeof(uint32_t));
 	rlwe_memset_volatile(eprimeprime, 0, 1024 * sizeof(uint32_t));
-	RAND_CTX_cleanup(&rand_ctx);
+	RAND_CHOICE_cleanup(&rand_ctx);
 	return ret;
 }
 
