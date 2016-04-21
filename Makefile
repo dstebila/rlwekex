@@ -18,7 +18,7 @@ PRNG_LDFLAGS=-lcrypto
 PRNG_CCFLAGS=-I/usr/local/opt/openssl/include
 PRNG_LDFLAGS=-L/usr/local/opt/openssl/lib -lcrypto
 
-CCFLAGS=-O3 -Wall -Wextra -std=c99 -Wno-deprecated-declarations -D$(PRNG) $(PRNG_CCFLAGS)
+CCFLAGS=-O3 -Wall -Wextra -std=c99 -Wno-deprecated-declarations -D$(PRNG) $(PRNG_CCFLAGS) #-DCONSTANT_TIME
 LDFLAGS=$(PRNG_LDFLAGS)
 
 all:
@@ -26,11 +26,15 @@ all:
 	$(CC) $(CCFLAGS) -Wno-unused-function -c rlwe.c
 	$(CC) $(CCFLAGS) -Wno-unused-function -c rlwe_kex.c
 	$(CC) $(CCFLAGS) -Wno-unused-function -Wno-unused-parameter -c rlwe_rand.c
-	$(CC) $(CCFLAGS) -o rlwe_main -lcrypto rlwe_main.c fft.o rlwe.o rlwe_kex.o rlwe_rand.o $(LDFLAGS)
-	$(CC) $(CCFLAGS) -o rlwe_benchmark -lcrypto rlwe_benchmark.c fft.o rlwe.o rlwe_kex.o rlwe_rand.o $(LDFLAGS)
+	$(CC) $(CCFLAGS) -o rlwe_main rlwe_main.c fft.o rlwe.o rlwe_kex.o rlwe_rand.o $(LDFLAGS)
+	$(CC) $(CCFLAGS) -o rlwe_benchmark rlwe_benchmark.c fft.o rlwe.o rlwe_kex.o rlwe_rand.o $(LDFLAGS)
+	$(CC) $(CCFLAGS) -Wno-unused-function -o rlwe_test rlwe_test.c fft.o rlwe_kex.o rlwe_rand.o $(LDFLAGS)
 
 clean:
-	rm fft.o rlwe.o rlwe_kex.o rlwe_rand.o rlwe_main rlwe_benchmark
+	rm fft.o rlwe.o rlwe_kex.o rlwe_rand.o rlwe_main rlwe_benchmark rlwe_test
+
+test:
+	./rlwe_test
 
 prettyprint:
 	astyle --style=java --indent=tab --pad-header --pad-oper --align-pointer=name --align-reference=name --suffix=none *.c *.h

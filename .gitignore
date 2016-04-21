@@ -29,3 +29,4 @@
 *.hex
 rlwe_benchmark
 rlwe_main
+rlwe_test
