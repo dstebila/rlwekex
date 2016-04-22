@@ -5,15 +5,14 @@
 #include <fcntl.h>
 #include "rlwe_rand.h"
 
-
-int dev_urandom_init(int *rand_ctx) {
+int RAND_CHOICE_init(int *rand_ctx) {
   int fd = open("/dev/urandom", O_RDONLY);
   if (!fd) return 1;
-  *rand_ctx = fd;
+  *rand_ctx = fd; 
   return 0;
 }
 
-void dev_urandom_cleanup(int *rand_ctx) {
+void RAND_CHOICE_cleanup(int *rand_ctx) {
   if (*rand_ctx)
     close(*rand_ctx);
 }
@@ -21,7 +20,7 @@ static void mkrandom(int *rand_ctx, uint8_t *buf, size_t len) {
   read(*rand_ctx, buf, len);
 }
 
-uint8_t  RANDOM8(int *rand_ctx) {
+uint8_t RANDOM8(int *rand_ctx) {
   uint8_t bit;
   mkrandom(rand_ctx, &bit, 1);
   return bit;

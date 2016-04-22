@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define RLWE_RANDOMNESS_USE_OPENSSL_AES
+#define RLWE_RANDOMNESS_USE_DEV_RANDOM
+// #define RLWE_RANDOMNESS_USE_OPENSSL_AES
 // #define RLWE_RANDOMNESS_USE_OPENSSL_RC4
 // #define RLWE_RANDOMNESS_USE_OPENSSL_RAND
 // #define RLWE_RANDOMNESS_USE_C_RANDOM_INSECURE
@@ -21,7 +22,7 @@
 #define RAND_CTX uint8_t
 #define RAND_CHOICE openssl_rand
 #elif defined(RLWE_RANDOMNESS_USE_DEV_URANDOM)
-#define RAND_CTX
+#define RAND_CTX int
 #define RAND_CHOICE dev_urandom
 #elif defined(RLWE_RANDOMNESS_USE_INSECURE_LIBC)
 #define RAND_CTX int
