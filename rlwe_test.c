@@ -17,7 +17,7 @@
 #include "rlwe_rand.h"
 #include "rlwe_table.h"
 
-const int ROUNDS = 1000;
+const int ROUNDS = 10000;
 const int MAX_NOISE = 52;
 
 int chi_squared(RAND_CTX *rand_ctx) {
@@ -57,7 +57,7 @@ int chi_squared(RAND_CTX *rand_ctx) {
         goto err;
       }
     }
-    printf("%2d: observed %6d, expected %g\n", j - MAX_NOISE, count[j], expect);
+    printf("%2d: observed %7d, expected %g\n", j - MAX_NOISE, count[j], expect);
     sum += expect;   
     
     chi_sqr += (count[j] - expect) * (count[j] - expect) / expect;

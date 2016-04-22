@@ -7,7 +7,7 @@ LDFLAGS=-lcrypto
 # Install your own more recent version and point to it.  
 # If you have installed OpenSSL via brew, you can use the following two lines.
 
-CPPFLAGS=-I/usr/local/opt/openssl/include # Add -DCONSTANT_TIME for constant time
+CPPFLAGS=-I/usr/local/opt/openssl/include #-DCONSTANT_TIME for constant time
 LDFLAGS=-L/usr/local/opt/openssl/lib -lcrypto
 
 all:
@@ -21,6 +21,9 @@ all:
 
 clean:
 	rm fft.o rlwe.o rlwe_kex.o rlwe_rand.o rlwe_main rlwe_benchmark rlwe_test
+
+test:
+	./rlwe_test
 
 prettyprint:
 	astyle --style=java --indent=tab --pad-header --pad-oper --align-pointer=name --align-reference=name --suffix=none *.c *.h
