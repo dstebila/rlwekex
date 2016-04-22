@@ -20,7 +20,8 @@
 const int ROUNDS = 1000;
 const int MAX_NOISE = 52;
 
-void chi_squared(RAND_CTX *rand_ctx) {
+int chi_squared(RAND_CTX *rand_ctx) {
+  int ret = -1;
   uint32_t s[1024];
   uint32_t count[2 * MAX_NOISE];
   memset(count, 0, sizeof(uint32_t) * 2 * MAX_NOISE);
@@ -32,18 +33,47 @@ void chi_squared(RAND_CTX *rand_ctx) {
 #else
     rlwe_sample(s, rand_ctx);
 #endif
-    for(j = 0; j < 1024; j++)
+    for(j = 0; j < 1024; j++) {
+      if(abs(s[j]) >= MAX_NOISE) {
+        printf("Noise is out of bounds\n");
+        goto err;
+      }        
       count[s[j] + MAX_NOISE]++;
+    }
   }
-  
   double sum = 0;
-  for(j = 0; j < 2 * MAX_NOISE; j++) {
+  int df = 0; // degrees of freedom
+  double chi_sqr = 0;
+  for(j = 1; j < 2 * MAX_NOISE; j++) { // skip count[0], which must be zero anyways
     int v = abs(j - MAX_NOISE);
-    uint64_t point_mass = v > 0 ? rlwe_table[v][2] - rlwe_table[v - 1][2] : 2 * rlwe_table[0][2];
-    double expect = ROUNDS * 1024 * (((double)point_mass) /  0xFFFFFFFFFFFFFFFFULL);
-    printf("%d: observed %d, expected %g\n", j - MAX_NOISE, count[j], expect);
+    double point_mass = v > 0 ? (rlwe_table[v][2] - rlwe_table[v - 1][2]) * .5 : (double) rlwe_table[0][2];
+    double expect = ROUNDS * 1024 * (point_mass /  0xFFFFFFFFFFFFFFFFULL);
+    
+    if(expect == 0) {
+      if(count[j] == 0)
+        continue; // nothing to do
+      else {
+        printf("Unexpected value (%d) has been output.\n", j - MAX_NOISE);
+        goto err;
+      }
+    }
+    printf("%2d: observed %6d, expected %g\n", j - MAX_NOISE, count[j], expect);
+    sum += expect;   
+    
+    chi_sqr += (count[j] - expect) * (count[j] - expect) / expect;
+    df++;
+  }
+  printf("The chi-squared statistic = %f (df = %d)\n", chi_sqr, df);
+
+  if (chi_sqr > 2 * df) { 
+    printf("Chi-squared test failed.\n");
+    goto err;
   }
   
+  ret = 1;
+  
+ err:
+  return ret;
 }
 
 int main() {

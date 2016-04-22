@@ -6,7 +6,8 @@ LDFLAGS=-lcrypto
 # On Mac OS X, the system OpenSSL is too old.  
 # Install your own more recent version and point to it.  
 # If you have installed OpenSSL via brew, you can use the following two lines.
-CPPFLAGS=-I/usr/local/opt/openssl/include -DCONSTANT_TIME
+
+CPPFLAGS=-I/usr/local/opt/openssl/include # Add -DCONSTANT_TIME for constant time
 LDFLAGS=-L/usr/local/opt/openssl/lib -lcrypto
 
 all:
