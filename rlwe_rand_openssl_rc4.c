@@ -7,14 +7,14 @@
 #include <stdio.h>
 #include <string.h>
 
-int RAND_CTX_init(RAND_CTX *rand_ctx) {
+int RAND_CHOICE_init(RAND_CTX *rand_ctx) {
 	unsigned char rc4_key[16];
 	RAND_bytes(rc4_key, 16);
 	EVP_CIPHER_CTX_init(rand_ctx);
 	return EVP_EncryptInit_ex(rand_ctx, EVP_rc4(), NULL, rc4_key, NULL);
 }
 
-void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx) {
 	EVP_CIPHER_CTX_cleanup(rand_ctx);
 }
 

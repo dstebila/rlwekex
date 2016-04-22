@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-int RAND_CTX_init(RAND_CTX *rand_ctx) {
+int RAND_CHOICE_init(RAND_CTX *rand_ctx) {
 	int ret = 1;
 	unsigned char aes_key[16];
 	unsigned char aes_iv[16];
@@ -20,7 +20,7 @@ int RAND_CTX_init(RAND_CTX *rand_ctx) {
 	return ret;
 }
 
-void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx) {
 	EVP_CIPHER_CTX_cleanup(rand_ctx);
 }
 
