@@ -1,4 +1,4 @@
-#warning "RC4 should not be considered a cryptographically secure pseudorandom number generator due to biases in its keystream output.  See rlwe_rand.h to switch to an AES-based PRNG."
+#warning "RC4 should not be considered a cryptographically secure pseudorandom number generator due to biases in its keystream output.  See README.md and the Makefile to switch to an AES-based PRNG."
 
 #include "rlwe_rand.h"
 

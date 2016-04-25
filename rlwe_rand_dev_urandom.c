@@ -1,3 +1,5 @@
+#warning "Using /dev/urandom to generate all randomness for sampling will result in very slow performance.  See README.md and the Makefile to switch to an AES-based PRNG seeded from OpenSSL's RAND_bytes."
+
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>

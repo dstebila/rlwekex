@@ -1,4 +1,4 @@
-#warning "Using OpenSSL's RAND_bytes to generate all randomness for sampling will result in very slow performance.  See rlwe_rand.h to switch to a PRNG seeded from OpenSSL's RAND_bytes."
+#warning "Using OpenSSL's RAND_bytes to generate all randomness for sampling will result in very slow performance.  See README.md and the Makefile to switch to an AES-based PRNG seeded from OpenSSL's RAND_bytes."
 
 #include "rlwe_rand.h"
 
