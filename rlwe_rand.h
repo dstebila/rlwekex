@@ -4,12 +4,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-// #define RLWE_RANDOMNESS_USE_OPENSSL_AES
-// #define RLWE_RANDOMNESS_USE_OPENSSL_RC4
-// #define RLWE_RANDOMNESS_USE_OPENSSL_RAND
-// #define RLWE_RANDOMNESS_USE_INSECURE_LIBC
-#define RLWE_RANDOMNESS_USE_DEV_URANDOM
-
 #if defined(RLWE_RANDOMNESS_USE_OPENSSL_AES)
 #include <openssl/evp.h>
 #define RAND_CTX EVP_CIPHER_CTX
