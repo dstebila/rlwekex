@@ -73,7 +73,7 @@ int main() {
 	}
 
 	RAND_CTX rand_ctx;
-	if (!RAND_CTX_init(&rand_ctx)) {
+	if (!RAND_CHOICE_init(&rand_ctx)) {
 		printf("Randomness allocation error.");
 		return -1;
 	}
@@ -105,7 +105,7 @@ int main() {
 	FFT_CTX_clear(&ctx);
 	FFT_CTX_free(&ctx);
 
-	RAND_CTX_cleanup(&rand_ctx);
+	RAND_CHOICE_cleanup(&rand_ctx);
 
 	return 0;
 

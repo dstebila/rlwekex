@@ -9,7 +9,7 @@ This software was initially distributed by the authors from <https://github.com/
 
 Instructions
 ------------
-The software is plain C (C99 standard).  Compilation has been tested using gcc on Linux and clang on Mac OS X.  
+The software is plain C (C99 standard).  Compilation has been tested using gcc on Linux and clang on Mac OS X.
 
 To compile:
 
@@ -27,7 +27,7 @@ To run the benchmark program:
 
 Cryptographically secure random number generation
 -------------------------------------------------
-Note that the key generation and key exchange algorithms make use of a random number generator during execution.  The sampling code is configured by default to use OpenSSL's PRNG to generate a seed and expand it using AES.  Several other options are available; see `rlwe.c`.  C's `random()` can be used for testing purposes by defining the macro `RLWE_RANDOMNESS_USE_C_RANDOM_INSECURE`, but this is **not secure**.  Developers can also define the `RANDOM_VARS`, `RANDOM8`, `RANDOM32`, `RANDOM64` macros with a cryptographically secure pseudorandom number generator of their own choosing.  
+Note that the key generation and key exchange algorithms make use of a random number generator during execution.  The sampling code is configured by default to use OpenSSL's PRNG to generate a seed and expand it using AES.  Several other options are available; see `Makefile`.  C's `random()` can be used for testing purposes by defining the macro `RLWE_RANDOMNESS_USE_INSECURE_LIBC`, but this is **not secure**.  Developers can also define the `RANDOM_VARS`, `RANDOM8`, `RANDOM32`, `RANDOM64` macros with a cryptographically secure pseudorandom number generator of their own choosing.
 
 License
 -------
