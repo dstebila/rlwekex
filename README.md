@@ -3,7 +3,7 @@ Post-quantum key exchange from the ring learning with errors problem
 
 This software implements the key exchange protocol based on the ring learning with errors (ring-LWE) problem from the following paper:
 
-* Joppe W. Bos, Craig Costello, Michael Naehrig, and Douglas Stebila. Post-quantum key exchange for the TLS protocol from the ring learning with errors problem. Cryptology ePrint Archive, Report 2014/599, August, 2014. <http://eprint.iacr.org/2014/599>
+* Joppe W. Bos, Craig Costello, Michael Naehrig, Douglas Stebila. Post-quantum key exchange for the TLS protocol from the ring learning with errors problem. In *Proc. IEEE Symposium on Security and Privacy (S&P) 2015*, pp. 553-570. IEEE, May 2015. DOI:[10.1109/SP.2015.40](http://dx.doi.org/10.1109/SP.2015.40), Eprint <http://eprint.iacr.org/2014/599>.
 
 This software was initially distributed by the authors from <https://github.com/dstebila/rlwekex>
 
