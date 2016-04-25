@@ -8,9 +8,9 @@
 
 int RAND_CHOICE_init(int *rand_ctx) {
   int fd = open("/dev/urandom", O_RDONLY);
-  if (!fd) return 1;
+  if (!fd) return 0;
   *rand_ctx = fd;
-  return 0;
+  return 1;
 }
 
 void RAND_CHOICE_cleanup(int *rand_ctx) {

@@ -31,6 +31,7 @@
 #error "No randomness generation algorithm defined."
 #endif
 
+/* Returns 1 on success, 0 on failure. */
 int RAND_CHOICE_init(RAND_CTX *rand_ctx);
 void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx);
 
