@@ -114,7 +114,7 @@ int main() {
 
   RAND_CTX rand_ctx;
 
-  if(!RAND_CTX_init(&rand_ctx)) {
+  if(!RAND_CHOICE_init(&rand_ctx)) {
     printf("Cannot initialize PRNG.\n");
     return -1;
   }
@@ -132,6 +132,6 @@ int main() {
 
     ret = 0; // success!
 cleanup:
-  RAND_CTX_cleanup(&rand_ctx);
+  RAND_CHOICE_cleanup(&rand_ctx);
   return ret;
 }
