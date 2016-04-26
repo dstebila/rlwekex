@@ -161,7 +161,7 @@ void rlwe_sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 			r >>= 1;
 			// use the constant time version single_sample
 			s[i * 64 + j] = single_sample_ct(rnd);
-			t = -s[i * 64 + j];
+			t = (uint32_t) -s[i * 64 + j];
 			s[i * 64 + j] = ct_select_u64(t, s[i * 64 + j], ct_eq_u64(m, 0));
 		}
 	}
@@ -223,7 +223,7 @@ void rlwe_sample(uint32_t *s, RAND_CTX *rand_ctx) {
 			r >>= 1;
 			s[i * 64 + j] = single_sample(rnd);
 			if (m) {
-				s[i * 64 + j] = 1 + ~s[i * 64 + j];
+				s[i * 64 + j] = (uint32_t) - s[i * 64 + j];
 			}
 		}
 	}
