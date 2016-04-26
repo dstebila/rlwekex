@@ -1,15 +1,15 @@
-#warning "Not using a cryptographically secure pseudorandom number generator.  See rlwe.c to switch to an OpenSSL-based PRNG or define your own."
+#warning "Not using a cryptographically secure pseudorandom number generator.  See README.md and the Makefile to switch to an OpenSSL-based PRNG or define your own."
 
 #include <stdlib.h>
 #include <string.h>
 
 #include "rlwe_rand.h"
 
-int RAND_CTX_init(RAND_CTX *rand_ctx) {
+int RAND_CHOICE_init(RAND_CTX *rand_ctx) {
 	return 1;
 }
 
-void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx) {
 }
 
 uint8_t  RANDOM8(RAND_CTX *rand_ctx) {

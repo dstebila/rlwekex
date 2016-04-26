@@ -1,4 +1,4 @@
-#warning "Using OpenSSL's RAND_bytes to generate all randomness for sampling will result in very slow performance.  See rlwe_rand.h to switch to a PRNG seeded from OpenSSL's RAND_bytes."
+#warning "Using OpenSSL's RAND_bytes to generate all randomness for sampling will result in very slow performance.  See README.md and the Makefile to switch to an AES-based PRNG seeded from OpenSSL's RAND_bytes."
 
 #include "rlwe_rand.h"
 
@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <string.h>
 
-int RAND_CTX_init(RAND_CTX *rand_ctx) {
+int RAND_CHOICE_init(RAND_CTX *rand_ctx) {
 	return 1;
 }
 
-void RAND_CTX_cleanup(RAND_CTX *rand_ctx) {
+void RAND_CHOICE_cleanup(RAND_CTX *rand_ctx) {
 }
 
 uint8_t  RANDOM8(RAND_CTX *rand_ctx) {

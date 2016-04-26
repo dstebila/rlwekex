@@ -16,6 +16,16 @@
 #include "rlwe_a.h"
 #include "rlwe_rand.h"
 
+#define CHECK_OK(op, val) \
+	{ \
+		int tmp_ret; \
+		tmp_ret = (op); \
+		if (tmp_ret != (val)) { \
+			fprintf(stderr, "Error (return code %d) at %s:%d\n", tmp_ret, __FILE__, __LINE__); \
+			return -1; \
+		} \
+	}
+
 int main() {
 
 	uint32_t *a = rlwe_a;
@@ -33,11 +43,11 @@ int main() {
 		return -1;
 	}
 
-	rlwe_kex_generate_keypair(a, s_alice, b_alice, &ctx);
-	rlwe_kex_generate_keypair(a, s_bob, b_bob, &ctx);
+	CHECK_OK(rlwe_kex_generate_keypair(a, s_alice, b_alice, &ctx), 1)
+	CHECK_OK(rlwe_kex_generate_keypair(a, s_bob, b_bob, &ctx), 1)
 
-	rlwe_kex_compute_key_bob(b_alice, s_bob, c, k_bob, &ctx);
-	rlwe_kex_compute_key_alice(b_bob, s_alice, c, k_alice, &ctx);
+	CHECK_OK(rlwe_kex_compute_key_bob(b_alice, s_bob, c, k_bob, &ctx), 1)
+	CHECK_OK(rlwe_kex_compute_key_alice(b_bob, s_alice, c, k_alice, &ctx), 1)
 
 	int keys_match = 1;
 	for (int i = 0; i < 16; i++) {
