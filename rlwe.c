@@ -109,28 +109,23 @@ static uint64_t ct_select_u64(uint64_t x, uint64_t y, uint64_t bit) {
  * This function runs in constant time.
  */
 static int cmplt_ct(uint64_t *a, uint64_t *b) {
-	uint64_t r = 0; /* result */
-	uint64_t m = 0; /* mask   */
-	int i;
-	for (i = 0; i < 3; ++i) {
-		r |= ct_lt_u64(a[i], b[i]) & ~m;
-		m |= ct_mask_u64(ct_ne_u64(a[i], b[i])); /* stop when a[i] != b[i] */
-	}
-	return r & 1;
+  uint64_t r = 0; /* result */
+  uint64_t m = 0; /* mask   */
+  int i;
+  for (i = 2; i >= 0; --i) {
+    r |= ct_lt_u64(a[i], b[i]) & ~m;
+    m |= ct_mask_u64(ct_ne_u64(a[i], b[i])); /* stop when a[i] != b[i] */
+  }
+  return r & 1;
 }
 
 static uint32_t single_sample(uint64_t *in) {
-	uint32_t lower_index = 0, this_index = 32, upper_index = 64;
-	int i;
-	for (i = 0; i < 6; i++) {
-		if (cmplt_ct(in, rlwe_table[this_index])) {
-			upper_index = this_index;
-		} else {
-			lower_index = this_index;
-		}
-		this_index = (lower_index + upper_index) / 2;
-	}
-	return lower_index;
+  size_t i = 0;
+
+  while (cmplt_ct(rlwe_table[i], in))  // ~3.5 comparisons in expectation
+    i++;
+
+  return i;
 }
 
 /* We assume that e contains two random bits in the two
@@ -148,7 +143,7 @@ static uint64_t dbl(const uint32_t in, int32_t e) {
 static uint32_t single_sample_ct(uint64_t *in) {
 	uint32_t index = 0, i;
 	for (i = 0; i < 52; i++) {
-		index = ct_select_u64(index, i, cmplt_ct(in, rlwe_table[i]));
+		index = ct_select_u64(index, i + 1, cmplt_ct(in, rlwe_table[i]));
 	}
 	return index;
 }
@@ -166,7 +161,7 @@ void rlwe_sample_ct(uint32_t *s, RAND_CTX *rand_ctx) {
 			r >>= 1;
 			// use the constant time version single_sample
 			s[i * 64 + j] = single_sample_ct(rnd);
-			t = 0xFFFFFFFF - s[i * 64 + j];
+			t = (uint32_t) -s[i * 64 + j];
 			s[i * 64 + j] = ct_select_u64(t, s[i * 64 + j], ct_eq_u64(m, 0));
 		}
 	}
@@ -226,10 +221,9 @@ void rlwe_sample(uint32_t *s, RAND_CTX *rand_ctx) {
 			RANDOM192(rnd, rand_ctx);
 			m = (r & 1);
 			r >>= 1;
-			m = 2 * m - 1;
 			s[i * 64 + j] = single_sample(rnd);
-			if (m == -1) {
-				s[i * 64 + j] = 0xFFFFFFFF - s[i * 64 + j];
+			if (m) {
+				s[i * 64 + j] = (uint32_t) - s[i * 64 + j];
 			}
 		}
 	}
