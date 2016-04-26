@@ -109,11 +109,14 @@ static uint64_t ct_select_u64(uint64_t x, uint64_t y, uint64_t bit) {
  * This function runs in constant time.
  */
 static int cmplt_ct(uint64_t *a, uint64_t *b) {
-  unsigned int m;
-  m = a[0] < b[0];
-  m = (a[1] < b[1]) | ((a[1] == b[1]) & m);
-  m = (a[2] < b[2]) | ((a[2] == b[2]) & m);
-  return m;  
+  uint64_t r = 0; /* result */
+  uint64_t m = 0; /* mask   */
+  int i;
+  for (i = 2; i >= 0; --i) {
+    r |= ct_lt_u64(a[i], b[i]) & ~m;
+    m |= ct_mask_u64(ct_ne_u64(a[i], b[i])); /* stop when a[i] != b[i] */
+  }
+  return r & 1;
 }
 
 static uint32_t single_sample(uint64_t *in) {

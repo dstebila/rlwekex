@@ -13,14 +13,51 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "rlwe.h"
 #include "rlwe_rand.h"
-#include "rlwe_table.h"
+
+#include "rlwe.c"
 
 const int ROUNDS = 10000;
 const int MAX_NOISE = 52;
 
-int chi_squared(RAND_CTX *rand_ctx) {
+static uint64_t test_values[][3] = {
+  {0ULL, 0ULL, 0ULL}, // 0
+  {1ULL, 0ULL, 0ULL}, // 1
+  {2ULL, 0ULL, 0ULL}, // 2
+  {0xFFFFFFFFFFFFFFFFULL, 0ULL, 0ULL}, // 2^64-1
+  {0ULL, 1ULL, 0ULL}, // 2^64
+  {1ULL, 1ULL, 0ULL}, // 2^64+1
+  {0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0ULL}, // 2^128-1
+  {0ULL, 0ULL, 1ULL}, // 2^128
+  {1ULL, 0ULL, 1ULL}, // 2^128 + 1
+  {0x6a09e667f3bcc907ULL, 0xb2fb1366ea957d3eULL,  0x3adec17512775099ULL}, // -1
+  {0x6a09e667f3bcc908ULL, 0xb2fb1366ea957d3eULL,  0x3adec17512775099ULL}, // digits of sqrt{2}
+  {0x6a09e667f3bcc909ULL, 0xb2fb1366ea957d3eULL,  0x3adec17512775099ULL}, // +1
+  {0ULL, 0ULL, 0xFFFFFFFFFFFFFFFFULL},
+  {0ULL, 0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL},
+  {0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL, 0xFFFFFFFFFFFFFFFFULL}  // = 2^192-1
+};
+
+int test_comparer() {
+  int i, j;
+  int n = sizeof(test_values) / (sizeof(uint64_t) * 3);
+
+  printf("Testing the comparison function... ");
+
+  for(i = 0; i < n; i++)
+    for(j = 0; j < n; j++)
+      if((i < j) != cmplt_ct(test_values[i], test_values[j])) {
+        printf("Test values (%d, %d) are compared incorrectly.\n", i, j);
+        return -1;
+      }
+  printf("OK\n");
+  return 1;
+}
+
+
+typedef void FuncSampler(uint32_t *s, RAND_CTX *rand_ctx);
+
+int chi_squared(FuncSampler sampler, RAND_CTX *rand_ctx) {
   int ret = -1;
   uint32_t s[1024];
   uint32_t count[2 * MAX_NOISE];
@@ -28,11 +65,7 @@ int chi_squared(RAND_CTX *rand_ctx) {
   
   int i, j;
   for(i = 0; i < ROUNDS; i++) {
-#ifdef CONSTANT_TIME
-    rlwe_sample_ct(s, rand_ctx);
-#else
-    rlwe_sample(s, rand_ctx);
-#endif
+    sampler(s, rand_ctx);
     for(j = 0; j < 1024; j++) {
       if(abs(s[j]) >= MAX_NOISE) {
         printf("Noise is out of bounds\n");
@@ -77,21 +110,28 @@ int chi_squared(RAND_CTX *rand_ctx) {
 }
 
 int main() {
+  int ret = -1;
+
   RAND_CTX rand_ctx;
+
   if(!RAND_CTX_init(&rand_ctx)) {
     printf("Cannot initialize PRNG.\n");
     return -1;
   }
-  
+
+  if(test_comparer() <= 0)
+    goto cleanup;
+
 #ifdef CONSTANT_TIME
     printf("Testing constant time sampling...\n");
+    chi_squared(rlwe_sample_ct, &rand_ctx);
 #else
     printf("Testing variable time sampling...\n");
+    chi_squared(rlwe_sample, &rand_ctx);
 #endif
-  
-  chi_squared(&rand_ctx);
-  
-  RAND_CTX_cleanup(&rand_ctx);
 
-  return 0;
+    ret = 0; // success!
+cleanup:
+  RAND_CTX_cleanup(&rand_ctx);
+  return ret;
 }
