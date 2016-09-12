@@ -7,6 +7,11 @@ This software implements the key exchange protocol based on the ring learning wi
 
 This software was initially distributed by the authors from <https://github.com/dstebila/rlwekex>
 
+NOTICE — Migration to new repository (2016/09/12)
+-------------------------------------------------
+
+This repository is no longer being updated.  The ring-LWE key exchange code has been incorporated into the [Open Quantum Safe project](https://github.com/open-quantum-safe/) and can be found under the [`src/kex_rlwe_bcns15`](https://github.com/open-quantum-safe/liboqs/tree/master/src/kex_rlwe_bcns15) directory in the [liboqs](https://github.com/open-quantum-safe/liboqs) repository.
+
 Instructions
 ------------
 The software is plain C (C99 standard).  Compilation has been tested using gcc on Linux and clang on Mac OS X.
